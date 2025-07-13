@@ -1,0 +1,202 @@
+<?php
+class AdminController
+{
+    private $userModel;
+    public function manageUsers()
+    {
+        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+            header('Location: ' . BASE_URL . '/home/index');
+            exit;
+        }
+
+        $perPage = 10;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $offset = ($page - 1) * $perPage;
+
+        // Lấy danh sách user từ DB
+        $this->userModel = new User();
+        if (!$this->userModel) {
+            die('User model not found');
+        }
+
+        $users = $this->userModel->getUsersPaginated($perPage, $offset);
+        $totalUsers = $this->userModel->countUsers();
+        $totalPages = ceil($totalUsers / $perPage);
+        require '../app/Views/admin/manageUsers.php';
+    }
+
+    public function dashboard()
+    {
+        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+            header('Location: ' . BASE_URL . '/home/index');
+            exit;
+        }
+
+        require '../app/Views/admin/dashboard.php';
+    }
+
+
+    public function addUser()
+    {
+        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+            header('Location: ' . BASE_URL . '/home/index');
+            exit;
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = trim($_POST['name']);
+            $email = trim($_POST['email']);
+            $passwordOrigin = $_POST['password'];
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            $confirmPassword = $_POST['confirm_password'];
+            $role = $_POST['role'] ?? 'user'; // Mặc định là người dùng
+
+            $this->userModel = new User();
+
+            if (strlen($passwordOrigin) < 8 || !preg_match('/\d/', $passwordOrigin)) {
+                $error = "mật khẩu phải từ 8 ký tự và chứa ít nhất một chữ số!";
+                require '../app/views/admin/addUser.php';
+                return;
+            }
+            if ($this->userModel->findByEmail($email)) {
+                $error = "Email đã được sử dụng!";
+                require '../app/views/admin/addUser.php';
+                return;
+            }
+            if ($passwordOrigin !== $confirmPassword) {
+                $error = "Mật khẩu nhập lại không khớp!";
+                require '../app/views/admin/addUser.php';
+                return;
+            }
+
+            $this->userModel->create($name, $email, $password, $role);
+            $message = urlencode("Đăng ký thành công! Vui lòng đăng nhập.");
+            header("Location: " . BASE_URL . "/admin/addUser?message=$message");
+            exit;
+
+        } else {
+            require '../app/views/admin/addUser.php';
+        }
+    }
+
+    public function editUser()
+    {
+        // Chỉ admin mới được phép
+        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+            header('Location: ' . BASE_URL . '/home/index');
+            exit;
+        }
+
+        // Lấy ID từ query string
+        if (!isset($_GET['id'])) {
+            die("Thiếu ID người dùng.");
+        }
+
+        $this->userModel = new User();
+        $userId = (int) $_GET['id'];
+        $user = $this->userModel->findById($userId);
+
+        if (!$user) {
+            $error = "Không tìm thấy người dùng.";
+            require '../app/views/admin/editUser.php';
+            return;
+        }
+
+        // Truyền $user vào view
+        require_once '../app/views/admin/editUser.php';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = trim($_POST['name']);
+            $email = trim($_POST['email']);
+            $passwordOrigin = $_POST['password'];
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            $role = $_POST['role'] ?? 'user'; // Mặc định là người dùng
+
+            $this->userModel = new User();
+
+            if (strlen($passwordOrigin) < 8 || !preg_match('/\d/', $passwordOrigin)) {
+                $error = "mật khẩu phải từ 8 ký tự và chứa ít nhất một chữ số!";
+                require '../app/views/admin/editUser.php';
+                return;
+            }
+            $user = $this->userModel->findByEmail($email);
+            if (!$user) {
+                $error = "Không tìm thấy người dùng.";
+                require '../app/views/admin/editUser.php';
+                return;
+            }
+            $this->userModel->update($user['id'], $name, $email, $password, $role);
+            $message = urlencode("Cập nhật người dùng thành công!");
+            header("Location: " . BASE_URL . "/admin/editUser?id=" . $user['id'] . "&message=$message");
+            exit;
+        } else {
+            require_once '../app/views/admin/editUser.php';
+        }
+
+    }
+
+
+    public function deleteUser()
+    {
+        // Logic to delete a user
+        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+            header('Location: ' . BASE_URL . '/home/index');
+            exit;
+        }
+
+        if (!isset($_GET['id'])) {
+            die("Thiếu ID người dùng.");
+        }
+
+        $this->userModel = new User();
+        $userId = (int) $_GET['id'];
+        $user = $this->userModel->findById($userId);
+
+        if (!$user) {
+            $error = "Không tìm thấy người dùng.";
+            require '../app/views/admin/manageUsers.php';
+            return;
+        }
+
+        $this->userModel->delete($userId);
+        $message = urlencode("Xóa người dùng thành công!");
+        header("Location: " . BASE_URL . "/admin/manageUsers?message=$message");
+        exit;
+    }
+
+    public function searchUsers()
+{
+    if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+        header('Location: ' . BASE_URL . '/home/index');
+        exit;
+    }
+
+    $keyword = trim($_GET['keyword'] ?? '');
+    $perPage = 10;
+    $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+    $offset = ($page - 1) * $perPage;
+
+    $this->userModel = new User();
+    if (!$this->userModel) {
+        die('User model not found');
+    }
+
+    //  Nếu là email thì tìm theo email và redirect
+    if (filter_var($keyword, FILTER_VALIDATE_EMAIL)) {
+        $user = $this->userModel->findByEmail($keyword); // viết thêm method này
+        if ($user) {
+            // Redirect tới trang sửa user theo ID
+            header('Location: ' . BASE_URL . '/admin/editUser?id=' . $user['id']);
+            exit;
+        }
+    }
+
+    //  Nếu không phải email → tìm theo tên như bình thường
+    $users = $this->userModel->getUsersPaginated($perPage, $offset, $keyword);
+    $totalUsers = $this->userModel->countUsers($keyword);
+    $totalPages = ceil($totalUsers / $perPage);
+
+    require '../app/Views/admin/manageUsers.php';
+}
+
+
+}

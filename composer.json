@@ -1,0 +1,19 @@
+{
+    "name": "mvn/musicofminh",
+    "autoload": {
+        "psr-4": {
+            "Mvn\\Musicofminh\\": "src/",
+            "App\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "minhvannghuyen",
+            "email": "minhvannghuyen@gmail.com"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.10",
+        "google/apiclient": "^2.18"
+    }
+}
