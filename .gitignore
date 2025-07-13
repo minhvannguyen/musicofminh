@@ -1,0 +1,37 @@
+# Ignore hệ thống
+.DS_Store
+Thumbs.db
+
+# Ignore môi trường dev
+.env
+*.log
+*.bak
+
+# Thư mục vendor nếu bạn dùng Composer
+/vendor/
+
+# Nếu bạn dùng Tailwind qua Node.js
+/node_modules/
+/package-lock.json
+/yarn.lock
+
+# Thư mục build nếu có
+/dist/
+/build/
+
+# Thư mục chứa file upload (hình ảnh người dùng tải lên)
+uploads/
+public/uploads/
+
+# Nếu dùng IDE như VSCode
+.vscode/
+
+# Cache hoặc backup tạm
+*.tmp
+*.swp
+*.swo
+*.bak
+*.old
+
+# Nếu dùng hệ thống template hoặc cache riêng
+/cache/
