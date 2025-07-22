@@ -24,6 +24,5 @@
                 echo "<p style='color:red; margin-top: 10px'>$error</p>"; ?>
     </form>
 </div>
-</form>
 </body>
 </html>

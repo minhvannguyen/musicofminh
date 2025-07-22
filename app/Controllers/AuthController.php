@@ -23,7 +23,7 @@ class AuthController
                 $_SESSION['user'] = $user;
                 if($user['role'] === 'admin') {
                     $_SESSION['is_admin'] = true; // Đánh dấu là admin
-                    require '../app/Views/admin/dashboard.php';
+                    require '../app/Views/dashboard/dashboard.php';
                 exit;
                     
                 } else {
@@ -33,7 +33,7 @@ class AuthController
                 }
             
             } else {
-                $error = "Sai email hoặc mật khẩu!";
+                $errors = "Sai email hoặc mật khẩu!";
                 require '../app/Views/auth/login.php';
             }
         } else {
@@ -53,22 +53,23 @@ class AuthController
             $this->userModel = new User();
 
             if (strlen($passwordOrigin) < 8 || !preg_match('/\d/', $passwordOrigin)) {
-                $error = "mật khẩu phải từ 8 ký tự và chứa ít nhất một chữ số!";
+                $errors = "mật khẩu phải từ 8 ký tự và chứa ít nhất một chữ số!";
                 require '../app/Views/auth/register.php';
                 return;
             }
             if ($this->userModel->findByEmail($email)) {
-                $error = "Email đã được sử dụng!";
+                $errors = "Email đã được sử dụng!";
                 require '../app/Views/auth/register.php';
                 return;
             }
             if ($passwordOrigin !== $confirmPassword) {
-                $error = "Mật khẩu nhập lại không khớp!";
+                $errors = "Mật khẩu nhập lại không khớp!";
                 require '../app/Views/auth/register.php';
                 return;
             }
 
-            $this->userModel->create($name, $email, $password);
+            $this->userModel->create($name, $email, $password , $role = 'user'); // Mặc định là người dùng
+            // Chuyển hướng về trang đăng nhập với thông báo thành công
             $message = urlencode("Đăng ký thành công! Vui lòng đăng nhập.");
             header("Location: " . BASE_URL . "/auth/login?message=$message");
             exit;
@@ -110,7 +111,7 @@ class AuthController
             $user = $this->userModel->findByEmail($email);
 
             if (!$user) {
-                $error = "Email không tồn tại trong hệ thống.";
+                $errors = "Email không tồn tại trong hệ thống.";
                 require '../app/Views/auth/forgot.php';
                 return;
             }
@@ -128,7 +129,7 @@ class AuthController
                 header("Location: " . BASE_URL . "/auth/verify");
                 exit;
             } else {
-                $error = "Không thể gửi mã xác nhận đến email. Vui lòng thử lại.";
+                $errors = "Không thể gửi mã xác nhận đến email. Vui lòng thử lại.";
                 require '../app/Views/auth/forgot.php';
             }
         } else {
@@ -142,13 +143,13 @@ class AuthController
             $inputToken = $_POST['token'] ?? '';
 
             if (!isset($_SESSION['reset_token']) || time() > $_SESSION['reset_token_expire']) {
-                $error = "Mã xác nhận đã hết hạn.";
+                $errors = "Mã xác nhận đã hết hạn.";
                 require '../app/Views/auth/verify.php';
                 return;
             }
 
             if ($inputToken != $_SESSION['reset_token']) {
-                $error = "Mã xác nhận không chính xác.";
+                $errors = "Mã xác nhận không chính xác.";
                 require '../app/Views/auth/verify.php';
                 return;
             }
@@ -168,19 +169,19 @@ class AuthController
             $confirm = $_POST['confirm_password'];
 
             if ($password !== $confirm) {
-                $error = "Mật khẩu không khớp.";
+                $errors = "Mật khẩu không khớp.";
                 require '../app/Views/auth/reset.php';
                 return;
             }
 
             if (strlen($password) < 8 || !preg_match('/\d/', $password)) {
-                $error = "Mật khẩu phải ít nhất 8 ký tự và chứa ít nhất một số.";
+                $errors = "Mật khẩu phải ít nhất 8 ký tự và chứa ít nhất một số.";
                 require '../app/Views/auth/reset.php';
                 return;
             }
 
             $email = $_SESSION['reset_email'];
-            $$this->userModel = new User();
+            $this->userModel = new User();
             $hashed = password_hash($password, PASSWORD_DEFAULT);
 
             $this->userModel->updatePasswordByEmail($email, $hashed);
@@ -228,7 +229,7 @@ class AuthController
             $_SESSION['user'] = [
                 'email' => $googleUser->email,
                 'name' => $googleUser->name,
-                'google_id' => $googleUser->id
+                'id' => $googleUser->id
             ];
 
             header('Location: ' . BASE_URL . '/home/index');

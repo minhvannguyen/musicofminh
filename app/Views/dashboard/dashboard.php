@@ -48,7 +48,7 @@
                     <i class="fas fa-users mr-3 text-gray-400 group-hover:text-white text-yellow-500"></i>
                     Người dùng
                 </a>
-                <a href="#"
+                <a href="<?= BASE_URL ?>/song/manageSongs?return_url=<?= urlencode( BASE_URL . '/admin/dashboard') ?>"
                     class="flex items-center px-4 py-3 hover:bg-gray-700 hover:text-white rounded-lg transition-colors group">
                     <i class="fas fa-music mr-3 text-gray-400 group-hover:text-white text-yellow-500"></i>
                     Bài hát

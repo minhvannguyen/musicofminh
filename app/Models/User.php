@@ -1,5 +1,4 @@
 <?php
-
 class User
 {
     private $db;
@@ -27,7 +26,7 @@ class User
         $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
-    }   
+    }
 
     public function findByName($searchTerm)
     {
@@ -46,39 +45,39 @@ class User
     }
 
     public function getUsersPaginated($limit, $offset, $keyword = null)
-{
-    if ($keyword) {
-        $stmt = $this->db->prepare("
+    {
+        if ($keyword) {
+            $stmt = $this->db->prepare("
             SELECT * FROM users 
             WHERE name LIKE :keyword 
             LIMIT :limit OFFSET :offset
         ");
-        $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
-    } else {
-        $stmt = $this->db->prepare("
+            $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+        } else {
+            $stmt = $this->db->prepare("
             SELECT * FROM users 
             LIMIT :limit OFFSET :offset
         ");
-    }
+        }
 
-    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
 
     public function countUsers($keyword = null)
-{
-    if ($keyword) {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE name LIKE :keyword");
-        $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
-    } else {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM users");
+    {
+        if ($keyword) {
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE name LIKE :keyword");
+            $stmt->bindValue(':keyword', '%' . $keyword . '%', PDO::PARAM_STR);
+        } else {
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM users");
+        }
+        $stmt->execute();
+        return $stmt->fetchColumn();
     }
-    $stmt->execute();
-    return $stmt->fetchColumn();
-}
 
     public function update($id, $name, $email, $password, $role)
     {
@@ -91,5 +90,7 @@ class User
         $stmt = $this->db->prepare("DELETE FROM users WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
+
 }
 ?>

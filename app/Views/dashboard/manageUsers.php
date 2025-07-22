@@ -39,7 +39,9 @@
                     ←
                 </a>
 
-                <h1 class="text-3xl font-bold text-blue-500 ml-4">Quản lý người dùng</h1>
+                <h1 class="text-3xl font-bold text-blue-500 ml-4">Quản lý người dùng <span class="text-gray-400 text-[20px] ml-2">(<?= $totalUsers ?>
+                    <i class="fas fa-user text-[15px] text-gray-400 group-hover:text-white"></i>)
+                    </span></h1>
             </div>
             <div class="flex justify-between items-center space-x-4">
                 <form method="GET" action="<?= BASE_URL ?>/admin/searchUsers">

@@ -73,15 +73,15 @@
 
                     </div>
 
-<div>
+
                     <button type="submit"
                         class="flex w-full justify-center rounded-md shadow-xl hover:shadow focus:shadow-md focus:shadow-outline border border-transparent bg-yellow-500 py-2 px-4 text-sm font-medium text-white">
                         Lưu
                     </button>
-</div>
+
                     <div class="h-7">
-                        <?php if (!empty($error))
-                            echo "<p style='color:red'>$error</p>"; ?>
+                        <?php if (!empty($errors))
+                            echo "<p style='color:red'>$errors</p>"; ?>
                         <?php if (isset($_GET['message'])): ?>
                             <div style='color:green; margin-top: 10px; font-size: 17px;'>
                                 <?= htmlspecialchars($_GET['message']) ?>

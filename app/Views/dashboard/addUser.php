@@ -77,8 +77,8 @@
                             <option value="admin">Quản trị viên</option>
                         </select>
                     </div>
-                    <?php if (!empty($error))
-                        echo "<p style='color:red'>$error</p>"; ?>
+                    <?php if (!empty($errors))
+                        echo "<p style='color:red'>$errors</p>"; ?>
                     <?php if (isset($_GET['message'])): ?>
                         <div style='color:green; margin-top: 10px; font-size: 17px;'>
                             <?= htmlspecialchars($_GET['message']) ?>

@@ -28,8 +28,8 @@
                                 <input
                                     class="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
                                     name="password" type="password" placeholder="Password" required />
-                                <?php if (!empty($error))
-                                    echo "<p style='color:red; margin-top: 10px'>$error</p>"; ?>
+                                <?php if (!empty($errors))
+                                    echo "<p style='color:red; margin-top: 10px'>$errors</p>"; ?>
                                 <button
                                     class="mt-5 tracking-wide font-semibold bg-yellow-500 text-gray-100 w-full py-4 shadow-2xl rounded-lg hover:shadow focus:shadow-md focus:shadow-outline transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

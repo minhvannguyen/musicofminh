@@ -22,7 +22,7 @@ class AdminController
         $users = $this->userModel->getUsersPaginated($perPage, $offset);
         $totalUsers = $this->userModel->countUsers();
         $totalPages = ceil($totalUsers / $perPage);
-        require '../app/Views/admin/manageUsers.php';
+        require '../app/Views/dashboard/manageUsers.php';
     }
 
     public function dashboard()
@@ -32,7 +32,7 @@ class AdminController
             exit;
         }
 
-        require '../app/Views/admin/dashboard.php';
+        require '../app/Views/dashboard/dashboard.php';
     }
 
 
@@ -53,18 +53,18 @@ class AdminController
             $this->userModel = new User();
 
             if (strlen($passwordOrigin) < 8 || !preg_match('/\d/', $passwordOrigin)) {
-                $error = "mật khẩu phải từ 8 ký tự và chứa ít nhất một chữ số!";
-                require '../app/views/admin/addUser.php';
+                $errors = "mật khẩu phải từ 8 ký tự và chứa ít nhất một chữ số!";
+                require '../app/views/dashboard/addUser.php';
                 return;
             }
             if ($this->userModel->findByEmail($email)) {
-                $error = "Email đã được sử dụng!";
-                require '../app/views/admin/addUser.php';
+                $errors = "Email đã được sử dụng!";
+                require '../app/views/dashboard/addUser.php';
                 return;
             }
             if ($passwordOrigin !== $confirmPassword) {
-                $error = "Mật khẩu nhập lại không khớp!";
-                require '../app/views/admin/addUser.php';
+                $errors = "Mật khẩu nhập lại không khớp!";
+                require '../app/views/dashboard/addUser.php';
                 return;
             }
 
@@ -74,7 +74,7 @@ class AdminController
             exit;
 
         } else {
-            require '../app/views/admin/addUser.php';
+            require '../app/views/dashboard/addUser.php';
         }
     }
 
@@ -96,13 +96,13 @@ class AdminController
         $user = $this->userModel->findById($userId);
 
         if (!$user) {
-            $error = "Không tìm thấy người dùng.";
-            require '../app/views/admin/editUser.php';
+            $errors = "Không tìm thấy người dùng.";
+            require '../app/views/dashboard/editUser.php';
             return;
         }
 
         // Truyền $user vào view
-        require_once '../app/views/admin/editUser.php';
+        require_once '../app/views/dashboard/editUser.php';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name']);
@@ -114,14 +114,14 @@ class AdminController
             $this->userModel = new User();
 
             if (strlen($passwordOrigin) < 8 || !preg_match('/\d/', $passwordOrigin)) {
-                $error = "mật khẩu phải từ 8 ký tự và chứa ít nhất một chữ số!";
-                require '../app/views/admin/editUser.php';
+                $errors = "mật khẩu phải từ 8 ký tự và chứa ít nhất một chữ số!";
+                require '../app/views/dashboard/editUser.php';
                 return;
             }
             $user = $this->userModel->findByEmail($email);
             if (!$user) {
-                $error = "Không tìm thấy người dùng.";
-                require '../app/views/admin/editUser.php';
+                $errors = "Không tìm thấy người dùng.";
+                require '../app/views/dashboard/editUser.php';
                 return;
             }
             $this->userModel->update($user['id'], $name, $email, $password, $role);
@@ -129,7 +129,7 @@ class AdminController
             header("Location: " . BASE_URL . "/admin/editUser?id=" . $user['id'] . "&message=$message");
             exit;
         } else {
-            require_once '../app/views/admin/editUser.php';
+            require_once '../app/views/dashboard/editUser.php';
         }
 
     }
@@ -152,51 +152,51 @@ class AdminController
         $user = $this->userModel->findById($userId);
 
         if (!$user) {
-            $error = "Không tìm thấy người dùng.";
-            require '../app/views/admin/manageUsers.php';
+            $errors = "Không tìm thấy người dùng.";
+            require '../app/views/dashboard/manageUsers.php';
             return;
         }
 
         $this->userModel->delete($userId);
         $message = urlencode("Xóa người dùng thành công!");
-        header("Location: " . BASE_URL . "/admin/manageUsers?message=$message");
+        header("Location: " . BASE_URL . "/manageUsers?message=$message");
         exit;
     }
 
     public function searchUsers()
-{
-    if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-        header('Location: ' . BASE_URL . '/home/index');
-        exit;
-    }
-
-    $keyword = trim($_GET['keyword'] ?? '');
-    $perPage = 10;
-    $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-    $offset = ($page - 1) * $perPage;
-
-    $this->userModel = new User();
-    if (!$this->userModel) {
-        die('User model not found');
-    }
-
-    //  Nếu là email thì tìm theo email và redirect
-    if (filter_var($keyword, FILTER_VALIDATE_EMAIL)) {
-        $user = $this->userModel->findByEmail($keyword); // viết thêm method này
-        if ($user) {
-            // Redirect tới trang sửa user theo ID
-            header('Location: ' . BASE_URL . '/admin/editUser?id=' . $user['id']);
+    {
+        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+            header('Location: ' . BASE_URL . '/home/index');
             exit;
         }
+
+        $keyword = trim($_GET['keyword'] ?? '');
+        $perPage = 10;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $offset = ($page - 1) * $perPage;
+
+        $this->userModel = new User();
+        if (!$this->userModel) {
+            die('User model not found');
+        }
+
+        //  Nếu là email thì tìm theo email và redirect
+        if (filter_var($keyword, FILTER_VALIDATE_EMAIL)) {
+            $user = $this->userModel->findByEmail($keyword); // viết thêm method này
+            if ($user) {
+                // Redirect tới trang sửa user theo ID
+                header('Location: ' . BASE_URL . '/editUser?id=' . $user['id']);
+                exit;
+            }
+        }
+
+        //  Nếu không phải email → tìm theo tên như bình thường
+        $users = $this->userModel->getUsersPaginated($perPage, $offset, $keyword);
+        $totalUsers = $this->userModel->countUsers($keyword);
+        $totalPages = ceil($totalUsers / $perPage);
+
+        require '../app/Views/dashboard/manageUsers.php';
     }
-
-    //  Nếu không phải email → tìm theo tên như bình thường
-    $users = $this->userModel->getUsersPaginated($perPage, $offset, $keyword);
-    $totalUsers = $this->userModel->countUsers($keyword);
-    $totalPages = ceil($totalUsers / $perPage);
-
-    require '../app/Views/admin/manageUsers.php';
-}
 
 
 }

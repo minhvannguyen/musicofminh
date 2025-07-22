@@ -27,7 +27,7 @@
                 <div class="relative">
                   <input type="email" id="email" name="email" class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-[#d39430] focus:ring-[#d39430] shadow-sm" required aria-describedby="email-error">
                 </div>
-                <?php if (!empty($error)) echo "<p style='color:red'>$error</p>"; ?>
+                <?php if (!empty($errors)) echo "<p style='color:red'>$errors</p>"; ?>
               </div>
               <button type="submit" class="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-yellow-500 text-gray-100 shadow-xl rounded-lg hover:shadow focus:shadow-md focus:shadow-outline">Xác nhận Email</button>
             </div>

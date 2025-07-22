@@ -2,7 +2,7 @@
 
 spl_autoload_register(function ($class) {
     // Các thư mục cần tìm
-    $folders = ['app/Controllers', 'app/Models', 'app/Core'];
+    $folders = ['app/Controllers', 'app/Models', 'app/config'];
 
     foreach ($folders as $folder) {
         $file = __DIR__ . '/../../' . $folder . '/' . $class . '.php';

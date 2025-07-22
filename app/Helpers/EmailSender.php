@@ -30,7 +30,7 @@ class EmailSender
         try {
             $this->mailer->clearAddresses();
             $this->mailer->addAddress($toEmail);
-
+            
             $this->mailer->Subject = 'Mã xác nhận khôi phục mật khẩu';
             $this->mailer->Body    = "Mã xác nhận của bạn là: <strong>$token</strong>";
 
