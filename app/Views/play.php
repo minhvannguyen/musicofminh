@@ -383,6 +383,11 @@
         // Toggle auto play
         autoPlayBtn.addEventListener("click", () => {
             autoPlay = !autoPlay;
+            if (replay && autoPlay) {
+                replay = false;
+                replayStatus.textContent = "Tắt";
+                audio.loop = false;
+            }
             autoPlayStatus.textContent = autoPlay ? "Bật" : "Tắt";
         });
 
@@ -390,6 +395,11 @@
         replayButton.addEventListener("click", () => {
             replay = !replay;
             replayStatus.textContent = replay ? "Bật" : "Tắt";
+            if (autoPlay && replay) {
+                autoPlay = false;
+                autoPlayStatus.textContent = "Tắt";
+
+            } 
             if (audio) {
                 audio.loop = replay;
             }
