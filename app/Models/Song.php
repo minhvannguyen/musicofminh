@@ -119,30 +119,34 @@ class Song
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getNewestSongs($limit = 9) {
+    public function getNewestSongs($limit = 9)
+    {
         $stmt = $this->db->prepare("SELECT * FROM songs ORDER BY created_at DESC LIMIT :limit");
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function isLikedByUser($userId, $songId) {
+    public function isLikedByUser($userId, $songId)
+    {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM likes WHERE user_id = ? AND song_id = ?");
         $stmt->execute([$userId, $songId]);
         return $stmt->fetchColumn() > 0;
     }
 
-    public function addLike($userId, $songId) {
+    public function addLike($userId, $songId)
+    {
         // Kiểm tra xem đã like chưa
         if ($this->isLikedByUser($userId, $songId)) {
             return false; // Đã like rồi
         }
-        
+
         $stmt = $this->db->prepare("INSERT INTO likes (user_id, song_id, created_at) VALUES (?, ?, NOW())");
         return $stmt->execute([$userId, $songId]);
     }
 
-    public function removeLike($userId, $songId) {
+    public function removeLike($userId, $songId)
+    {
         $stmt = $this->db->prepare("DELETE FROM likes WHERE user_id = ? AND song_id = ?");
         return $stmt->execute([$userId, $songId]);
     }
@@ -173,6 +177,35 @@ class Song
         $stmt->execute();
         return $stmt->fetchColumn();
     }
+
+    public function countViews()
+{
+    $stmt = $this->db->prepare("SELECT SUM(view_count) FROM songs");
+    $stmt->execute();
+    return $stmt->fetchColumn();
+}
+
+
+    public function countLikes()
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM likes");
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function countNewestSongs()
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM songs WHERE DATE(created_at) = CURDATE()");
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+    public function countNewestLikes()
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM likes WHERE DATE(created_at) = CURDATE()");
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+    
 
 }
 

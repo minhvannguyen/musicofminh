@@ -1,7 +1,14 @@
 <?php
 class AdminController
 {
+    private $songModel;
     private $userModel;
+
+    public function __construct()
+    {
+        $this->userModel = new User();
+        $this->songModel = new Song();
+    }
     public function manageUsers()
     {
         if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
@@ -14,7 +21,6 @@ class AdminController
         $offset = ($page - 1) * $perPage;
 
         // Lấy danh sách user từ DB
-        $this->userModel = new User();
         if (!$this->userModel) {
             die('User model not found');
         }
@@ -31,6 +37,40 @@ class AdminController
             header('Location: ' . BASE_URL . '/home/index');
             exit;
         }
+
+
+        // Danh sách ngẫu nhiên
+        $randomSongs = $this->songModel->getRandomSongs(9);
+
+        // Bài hát nhiều lượt xem
+        $topSongs = $this->songModel->getTopSongs(9);
+
+        // Nếu đã đăng nhập thì lấy bài yêu thích
+        $favoriteSongs = [];
+        
+        $newestSongs = $this->songModel->getNewestSongs(9);
+        if (isset($_SESSION['user']['id'])) {
+            $favoriteSongs = $this->songModel->getFavoriteSongsByUser($_SESSION['user']['id'], 9);
+        }
+
+        // Nếu đã đăng nhập thì lấy bài hát của bạn
+        $mySongs = [];
+        
+        if (isset($_SESSION['user']['id'])) {
+            $mySongs = $this->songModel->getMySongs($_SESSION['user']['id'], 9);
+        }
+
+        //count songs
+        $totalSongs = $this->songModel->countSongs();
+        $totalNewestSongs = $this->songModel->countNewestSongs();
+        $totalUsers = $this->userModel->countUsers();
+        $totalNewestUsers = $this->userModel->countNewestUsers();
+        $totalViews = $this->songModel->countViews();
+        $totalLikes = $this->songModel->countLikes();
+        $totalNewestLikes = $this->songModel->countNewestLikes();
+        $onlineUser = new OnlineUserController();
+        $onlineCount = $onlineUser->track();
+
 
         require '../app/Views/dashboard/dashboard.php';
     }

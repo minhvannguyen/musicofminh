@@ -91,6 +91,13 @@ class User
         return $stmt->execute([$id]);
     }
 
+    public function countNewestUsers()
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE()");
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
 
 }
 ?>
