@@ -8,10 +8,10 @@ class Song
         $this->db = Database::getInstance();
     }
 
-    public function addSong($title, $artist, $genre, $file, $thumbnail)
+    public function addSong($title, $artist, $genre, $file, $thumbnail, $created_by)
     {
-        $stmt = $this->db->prepare("INSERT INTO songs (title, artist, genre, file, thumbnail) VALUES (?, ?, ?, ?, ?)");
-        return $stmt->execute([$title, $artist, $genre, $file, $thumbnail]);
+        $stmt = $this->db->prepare("INSERT INTO songs (title, artist, genre, file, thumbnail, created_by) VALUES (?, ?, ?, ?, ?, ?)");
+        return $stmt->execute([$title, $artist, $genre, $file, $thumbnail, $created_by]);
     }
 
     public function getSongsPaginated($limit, $offset, $keyword = null)
@@ -147,6 +147,32 @@ class Song
         return $stmt->execute([$userId, $songId]);
     }
 
+    public function getMySongs($userId, $limit = 9)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM songs WHERE created_by = :user_id ORDER BY created_at DESC LIMIT :limit");
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getMySongsPaginated($userId, $limit, $offset)
+    {
+        $stmt = $this->db->prepare("SELECT * FROM songs WHERE created_by = :user_id ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countMySongs($userId)
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM songs WHERE created_by = :user_id");
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
 
 }
 

@@ -22,6 +22,13 @@ class HomeController
             $favoriteSongs = $this->songModel->getFavoriteSongsByUser($_SESSION['user']['id'], 9);
         }
 
+        // Nếu đã đăng nhập thì lấy bài hát của bạn
+        $mySongs = [];
+        
+        if (isset($_SESSION['user']['id'])) {
+            $mySongs = $this->songModel->getMySongs($_SESSION['user']['id'], 9);
+        }
+
         require_once '../app/Views/home.php';
 
     }

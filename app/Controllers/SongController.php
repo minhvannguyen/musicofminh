@@ -93,8 +93,8 @@ class SongController
                 $artist,
                 $genre,
                 $filePath,
-                $thumbnailPath
-
+                $thumbnailPath,
+                $_SESSION['user']['id']
             );
 
             // Chuyển hướng về danh sách bài hát
@@ -247,6 +247,25 @@ class SongController
         $totalSongs = $this->songModel->countSongs($keyword);
         $totalPages = ceil($totalSongs / $perPage);
 
+
+        require '../app/Views/dashboard/song/manageSongs.php';
+    }
+
+    public function mySongs()
+    {
+
+        $perPage = 10;
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $offset = ($page - 1) * $perPage;
+
+        $this->songModel = new Song();
+        if (!$this->songModel) {
+            die('Song model not found');
+        }
+
+        $songs = $this->songModel->getMySongsPaginated($_SESSION['user']['id'], $perPage, $offset);
+        $totalSongs = $this->songModel->countMySongs($_SESSION['user']['id']);
+        $totalPages = ceil($totalSongs / $perPage);
 
         require '../app/Views/dashboard/song/manageSongs.php';
     }

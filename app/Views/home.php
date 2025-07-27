@@ -178,9 +178,6 @@
         class="bg-purple-600 text-white px-4 py-1 rounded-r hover:bg-purple-700 transition">Tìm</button>
     </form>
     <div>
-      <a href="<?= BASE_URL ?>/song/addSong?return_url=<?= urlencode(BASE_URL . '/song/manageSongs') ?>"
-      class="bg-purple-600 text-white px-4 py-1 rounded font-semibold hover:bg-purple-700 transition mr-4">Thêm
-        bài hát</a>
       <?php if (!empty($_SESSION['user'])): ?>
         <a href="<?= BASE_URL ?>/auth/logout"
           class="bg-red-600 text-white px-4 py-1 rounded font-semibold hover:bg-purple-700 transition">Đăng
@@ -602,7 +599,56 @@
         <?php endif; ?>
       </div>
     </section>
-
+    <!-- Bài Hát của tôi -->
+    <section class="w-full mx-auto mb-8 px-0 pl-8 pr-8 mb-16 mt-16">
+      <div class="flex justify-between items-center mb-4 px-0">
+        <h2 class="text-lg font-bold text-purple-700">Bài Hát của tôi</h2>
+        <div class="flex items-center gap-3">
+          <a href="<?= BASE_URL ?>/song/mySongs" class="text-purple-600 hover:underline text-sm">Xem tất cả</a>
+          <a href="<?= BASE_URL ?>/song/addSong?return_url=<?= urlencode(BASE_URL . '/song/manageSongs') ?>"
+            class="bg-purple-600 text-white px-4 py-1 rounded font-semibold hover:bg-purple-700 transition">Thêm
+            bài hát</a>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+        <?php if (!empty($mySongs)): ?>
+          <?php foreach ($mySongs as $song): ?>
+            <div class="bg-white rounded-lg shadow hover:shadow-lg transition flex flex-col">
+              <?php
+              $thumbnail = $song['thumbnail'] ?? '';
+              $thumbnailUrl = !empty($thumbnail)
+                ? BASE_URL . '/' . ltrim($thumbnail, '/')
+                : 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=400&q=80';
+              ?>
+              <img src="<?= htmlspecialchars($thumbnailUrl) ?>" class="rounded-t-lg w-full aspect-square object-cover"
+                onerror="handleImageError(this, '<?= htmlspecialchars($song['title'] ?? '') ?>', '<?= htmlspecialchars($song['artist'] ?? '') ?>', '<?= htmlspecialchars($song['genre'] ?? '') ?>')" />
+              <div class="p-3 flex-1 flex flex-col justify-between">
+                <div>
+                  <div class="font-semibold text-md text-gray-800 truncate" title="<?= htmlspecialchars($song['title']) ?>">
+                    <?= htmlspecialchars($song['title']) ?>
+                  </div>
+                  <div class="text-xs text-gray-500 mt-1 truncate" title="<?= htmlspecialchars($song['artist']) ?>">
+                    <?= htmlspecialchars($song['artist']) ?>
+                  </div>
+                </div>
+                <a href="<?= BASE_URL ?>/song/play?id=<?= urlencode($song['id']) ?>&type=favorite" target="_blank"
+                  class="mt-3 bg-purple-600 text-white px-3 py-1 rounded text-center font-semibold hover:bg-purple-700 transition">Phát</a>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <div class="col-span-full text-center text-gray-400 py-8">
+            <?php if (isset($_SESSION['user']['id'])): ?>
+              Bạn chưa có bài hát nào.
+            <?php else: ?>
+              <a href="<?= BASE_URL ?>/auth/login"
+                class="bg-purple-600 text-white px-4 py-1 rounded font-semibold hover:bg-purple-700 transition">Đăng
+                nhập</a> để xem bài hát của bạn.
+            <?php endif; ?>
+          </div>
+        <?php endif; ?>
+      </div>
+    </section>
   </main>
 
   <footer class="mt-12 py-4 text-center text-xs text-gray-400">
