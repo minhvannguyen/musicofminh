@@ -97,7 +97,7 @@ class AuthController
     session_destroy();
 
     // Chuyển về login của bạn
-    header("Location: " . BASE_URL . "/auth/login");
+    header("Location: " . BASE_URL . "/home/index");
     exit;
 }
 

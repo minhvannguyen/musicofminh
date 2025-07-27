@@ -31,7 +31,7 @@
                                 <?php if (!empty($errors))
                                     echo "<p style='color:red; margin-top: 10px'>$errors</p>"; ?>
                                 <button
-                                    class="mt-5 tracking-wide font-semibold bg-yellow-500 text-gray-100 w-full py-4 shadow-2xl rounded-lg hover:shadow focus:shadow-md focus:shadow-outline transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
+                                    class="mt-5 tracking-wide font-semibold bg-purple-600 text-white w-full py-4 shadow-2xl rounded-lg hover:shadow focus:shadow-md focus:shadow-outline transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                         <path stroke-linecap="round" stroke-linejoin="round"

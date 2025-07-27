@@ -9,8 +9,6 @@ require_once '../app/config/Router.php';
 $router = new Router();
 $router->handleRequest();
 
-if (isset($_SESSION['user'])) {
-    echo "<br>Xin chào " . $_SESSION['user']['name'];
-}
+
 ?>  
 

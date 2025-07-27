@@ -30,9 +30,9 @@
         <div class="flex items-center justify-center h-16 bg-white">
             <div class="flex items-center mr-9 mt-3">
                 <div class="flex items-center justify-center">
-                    <img src="/musicofminh/public/uploads/image/logo.png" alt="logo website" class="w-20 h-20">
+                    <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Logo" class="w-12 h-12">
                 </div>
-                <span class="text-yellow-500 text-2xl font-bold">MusicChill</span>
+                <span class="font-bold text-2xl text-purple-700 ml-2">MusicOfMinh</span>
             </div>
         </div>
 
@@ -110,6 +110,10 @@
                                     class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
                             </button>
                         </div>
+                        <a href="<?= BASE_URL ?>/auth/logout" title="Đăng xuất"
+                           class="p-2 text-gray-600 hover:text-white hover:bg-red-500 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt text-2xl"></i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -566,6 +570,25 @@
                     this.style.transform = 'translateY(0)';
                 });
             });
+        });
+    </script>
+</body>
+
+</html>
+            // Thêm script toggle menu thả xuống cho Cài đặt
+            var btn = document.getElementById('settingsDropdownBtn');
+            var menu = document.getElementById('settingsDropdownMenu');
+            if (btn && menu) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    menu.classList.toggle('hidden');
+                });
+                document.addEventListener('click', function (e) {
+                    if (!btn.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                });
+            }
         });
     </script>
 </body>

@@ -25,11 +25,11 @@
               <div>
                 <label for="email" class="block text-sm font-bold ml-1 mb-2 dark:text-white">Email</label>
                 <div class="relative">
-                  <input type="email" id="email" name="email" class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-[#d39430] focus:ring-[#d39430] shadow-sm" required aria-describedby="email-error">
+                  <input type="email" id="email" name="email" class="py-3 px-4 block w-full border-2 border-gray-200 rounded-md text-sm focus:border-purple-600 focus:ring-purple-600 shadow-sm" required aria-describedby="email-error">
                 </div>
                 <?php if (!empty($errors)) echo "<p style='color:red'>$errors</p>"; ?>
               </div>
-              <button type="submit" class="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-yellow-500 text-gray-100 shadow-xl rounded-lg hover:shadow focus:shadow-md focus:shadow-outline">Xác nhận Email</button>
+              <button type="submit" class="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-purple-600 text-white shadow-xl rounded-lg hover:shadow focus:shadow-md focus:shadow-outline">Xác nhận Email</button>
             </div>
           </form>
         </div>

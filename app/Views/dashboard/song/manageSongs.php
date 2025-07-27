@@ -39,7 +39,7 @@
                     ←
                 </a>
 
-                <h1 class="text-3xl font-bold text-blue-500 ml-4">Quản lý bài hát <span
+                <h1 class="text-3xl font-bold text-blue-500 ml-4">Danh sách bài hát <span
                         class="text-gray-400 text-[20px] ml-2">(<?= $totalSongs ?>
                         <i class="fas fa-music text-[15px] text-gray-400 group-hover:text-white"></i>)
                     </span></h1>
@@ -63,7 +63,7 @@
         </div>
 
         <table class="min-w-full divide-y divide-gray-200 overflow-x-auto mt-6">
-            <thead class="bg-yellow-500">
+            <thead class="bg-purple-600">
                 <tr>
                     <th scope="col"
                         class="px-20 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
@@ -111,19 +111,19 @@
                             <?= htmlspecialchars($song['file']) ?>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <a href="<?= BASE_URL ?>/song/play?id=<?= $song['id'] ?>"
+                            <a href="<?= BASE_URL ?>/song/play?id=<?= $song['id'] ?>" target="_blank"
                                 class="text-indigo-600 hover:text-indigo-900 mr-4">
                                 <i class="fas fa-play text-[15px] text-green-500 group-hover:text-white"></i>
                             </a>
-                            <a href="<?= BASE_URL ?>/song/editSong?id=<?= $song['id'] ?>"
-                                class="text-indigo-600 hover:text-indigo-900">Sửa</a>
-
-                            <a href="<?= BASE_URL ?>/song/deleteSong?id=<?= $song['id'] ?>"
-                                class="ml-2 text-red-600 hover:text-red-900"
-                                onclick="return confirm('Bạn có chắc chắn muốn xóa bài hát này không?')">
-                                Xóa
-                            </a>
-
+                            <?php if (!empty($_SESSION['adminz'])): ?>
+                                <a href="<?= BASE_URL ?>/song/editSong?id=<?= $song['id'] ?>"
+                                    class="text-indigo-600 hover:text-indigo-900">Sửa</a>
+                                <a href="<?= BASE_URL ?>/song/deleteSong?id=<?= $song['id'] ?>"
+                                    class="ml-2 text-red-600 hover:text-red-900"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa bài hát này không?')">
+                                    Xóa
+                                </a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>

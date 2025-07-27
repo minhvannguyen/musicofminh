@@ -30,11 +30,11 @@ class SongController
 
     public function addSong()
     {
-        // Kiểm tra quyền admin
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+        if (!isset($_SESSION['user'])) {
             header('Location: ' . BASE_URL . '/home/index');
             exit;
         }
+
 
         // Nếu là phương thức POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -147,7 +147,7 @@ class SongController
             // Khởi tạo đường dẫn mặc định từ DB (giữ lại nếu không có file mới)
             $filePath = $song['file'] ?? null;
             $thumbnailPath = $song['thumbnail'] ?? null;
-            
+
             // Xử lý file nhạc
             if ($file && $file['error'] === UPLOAD_ERR_OK) {
                 $fileType = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -198,7 +198,7 @@ class SongController
         require_once '../app/views/dashboard/song/editSong.php';
 
     }
-    
+
     public function deleteSong()
     {
         // Chỉ admin mới được phép
@@ -232,10 +232,6 @@ class SongController
 
     public function searchSongs()
     {
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            header('Location: ' . BASE_URL . '/home/index');
-            exit;
-        }
 
         $keyword = trim($_GET['keyword'] ?? '');
         $perPage = 10;
@@ -247,20 +243,18 @@ class SongController
             die('Song model not found');
         }
 
-        //  Nếu không phải email → tìm theo tên như bình thường
         $songs = $this->songModel->getSongsPaginated($perPage, $offset, $keyword);
         $totalSongs = $this->songModel->countSongs($keyword);
         $totalPages = ceil($totalSongs / $perPage);
 
+
         require '../app/Views/dashboard/song/manageSongs.php';
     }
 
-    public function play() {
-        // Chỉ admin mới được phép
-        if (!isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-            header('Location: ' . BASE_URL . '/home/index');
-            exit;
-        }
+    public function play()
+    {
+        $type = $_GET['type'] ?? 'newest';
+        $songId = $_GET['id'] ?? null;
 
         // Lấy ID từ query string
         if (!isset($_GET['id'])) {
@@ -277,9 +271,99 @@ class SongController
             return;
         }
 
+        // Lấy danh sách bài hát theo type
+switch ($type) {
+    case 'favorite':
+        if (isset($_SESSION['user']['id'])) {
+            $songs = $this->songModel->getFavoriteSongsByUser($_SESSION['user']['id'], 30);
+        } else {
+            $songs = $this->songModel->getNewestSongs(30); // fallback nếu chưa đăng nhập
+        }
+        break;
+
+    case 'top':
+        $songs = $this->songModel->getTopSongs(30); // bạn cần có hàm này trong model
+        break;
+
+    case 'random':
+        $songs = $this->songModel->getRandomSongs(30); // bạn cần có hàm này trong model
+        break;
+
+    default:
+        $songs = $this->songModel->getNewestSongs(30);
+        break;
+}
+
+
+        // Truyền ra biến `$songs` và `$currentSong`
+        $currentSong = $song;
+
+        // Cập nhật view_count
+        $this->songModel->incrementViewCount($songId);
+
+        // Kiểm tra xem user đã like bài hát này chưa
+        $isLiked = false;
+        if (isset($_SESSION['user']['id'])) {
+            $isLiked = $this->songModel->isLikedByUser($_SESSION['user']['id'], $songId);
+        }
+
         require_once '../app/views/play.php';
 
     }
+
+    public function toggleLike()
+    {
+        // Kiểm tra user đã đăng nhập chưa
+        if (!isset($_SESSION['user']['id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để thực hiện thao tác này!']);
+            return;
+        }
+
+        // Lấy dữ liệu từ request
+        $input = json_decode(file_get_contents('php://input'), true);
+        $songId = (int) $input['song_id'] ?? 0;
+        $action = $input['action'] ?? '';
+
+        if (!$songId) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'ID bài hát không hợp lệ!']);
+            return;
+        }
+
+        $this->songModel = new Song();
+        $userId = $_SESSION['user']['id'];
+
+        try {
+            if ($action === 'like') {
+                $result = $this->songModel->addLike($userId, $songId);
+                $message = 'Đã thêm vào yêu thích!';
+            } else {
+                $result = $this->songModel->removeLike($userId, $songId);
+                $message = 'Đã xóa khỏi yêu thích!';
+            }
+
+            if ($result) {
+                echo json_encode([
+                    'success' => true,
+                    'liked' => $action === 'like',
+                    'message' => $message
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Có lỗi xảy ra khi thực hiện thao tác!'
+                ]);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra: ' . $e->getMessage()
+            ]);
+        }
+    }
+
 
 }
 ?>
